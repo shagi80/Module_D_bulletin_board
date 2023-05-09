@@ -1,0 +1,39 @@
+Инициализация Git
+git init
+
+Добавить все файлы в отслеживание
+git add .
+
+Создание виртуального окружения
+py -m venv venv
+
+Активация виртуального окружения
+venv/Scripts/activate
+
+Обновеление pip
+python3 -m pip install --upgrade pip
+
+Установка Django
+py -m pip install Django
+
+Проверка установки
+py
+>>> import django
+>>> print(django.get_version())
+
+Создание проекта
+django-admin startproject project_name
+
+Применение миграций
+py manage.py migrate
+
+Создание суперпользоателя
+py manage.py createsuperuser
+
+Создание приложение
+py manage.py startapp app_name
+
+Установка библиотеки Pillow для работы с ImageField
+py -m pip install --upgrade Pillow
+
+

@@ -1,0 +1,120 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    {{ block.super }}Все новости
+{% endblock title %}
+
+
+{% block content %}
+    <main class="row my-5">
+
+        <!-- бокове меню выбора категории объявлений  -->
+        <div class="col-lg-3 mb-3">
+            <ul class="list-group">
+                <a href="{% url 'user_page' %}" class="list-group-item list-group-item-action" aria-current="true">
+                    <strong>Все объявления</strong>
+                </a>
+                {% for key,title in categories %}
+                    <a href="{% url 'user_page_category' forloop.counter0 %}" class="list-group-item list-group-item-action" aria-current="true">
+                        {{ title }}
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>  
+
+
+        <div class='col-lg-9'>
+            
+            <!-- зголовок отображаемой категории --->
+            <div class='row justify-content-between align-items-center mb-4'>              
+                <h3 class="col-auto">                       
+                    {% if current_category_title %}
+                        {{ current_category_title }}
+                    {% else %}
+                        Все ваши объявления
+                    {% endif %}
+                </h3>    
+            </div>
+
+            {% for advert in adverts %}
+                <div class="card mb-2">
+                    <div class="card-header row justify-content-center justify-content-sm-between">
+                        <div class='col-auto'>{{ advert.created_at|date:'d F Y H:i:s' }}</div>
+                        <div class='col-sm-auto text-center'>
+                            <a href="{% url 'update_advert' advert.pk %}" class="btn btn-outline-secondary btn-sm">Изменить ...</a>
+                            <a href="{% url 'delete_advert' advert.pk %}" class="btn btn-outline-danger btn-sm">Удалить...</a>        
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ advert.get_category_display }}</h5>
+                        <p class="card-text">{{ advert.title }}</p>
+                        
+                        {% if advert.comment_set.all.count %}
+                            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments-{{ advert.pk }}" aria-expanded="false" aria-controls="collapseComments-{{ advert.pk }}">
+                                Показать/скрыть комментарии
+                            </button>
+                            <div class="collapse" id="collapseComments-{{ advert.pk }}">
+
+                                <!-- Вывод комментариев  -->
+                                <div id='comments' class='row mx-3 mt-4'>
+                                    {% for comment in advert.comment_set.all %}
+                                        <div id='comment_div_{{ comment.pk }}' class='mb-3'>
+                                            <strong class='text-muted'> {{ comment.created_at|date:'d F Y H:i:s' }}  {{ comment.author }}</strong>
+                                            <div> {{ comment.text }} </div> 
+                                            <!-- автору объявления даем возможность изменить статус -->
+                                            {% if advert.author == request.user %}                  
+                                                {% if comment.accepted %}
+                                                    <div class='text-success'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                                        </svg>
+                                                        принят
+                                                    </div>
+                                                {% else %}
+                                                    <!-- кнопки автора объявления -->
+                                                    <div id='advert_author_buttons_{{ comment.pk }}'>
+                                                        <button class='btn-accept btn btn-sm' comment-pk='{{ comment.pk }}'data-url='{% url "comment_accept"  %}' token='{{ csrf_token }}'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                                            </svg>
+                                                            Принять
+                                                        </button>
+                                                        <button class='btn-delete btn btn-sm' comment-pk='{{ comment.pk }}'data-url='{% url "comment_delete"  %}' token='{{ csrf_token }}'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                            </svg>
+                                                            Отклонить
+                                                        </button>
+                                                    </div>
+                                                    <div id='advert_comment_success_{{ comment.pk }}' class='text-success' style='display:none'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                                        </svg>
+                                                        принят
+                                                    </div>
+                                                {% endif %}                               
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        {% else %}
+                            <h6 class='text-muted'>Нет комментариев ...</h6>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% empty %}
+                <h4 class='my-5 text-center text-muted'>У вас пока нет объявлений ...</h4>
+            {% endfor %}
+        </div>
+    </main>
+{% endblock content %}
+
+
+{% block script %}
+    <script src="{% static 'scripts/comment_handler.js' %}"></script>
+{% endblock script %}

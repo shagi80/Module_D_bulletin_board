@@ -1,0 +1,15 @@
+{% if form.instance.pk %}
+<form method='POST' action="{% url 'comment_update' form.instance.pk %}">
+{% else %}
+<form method='POST' action="{% url 'comment_add' %}">
+{% endif %}
+    {% csrf_token %}
+
+    {{ form.advert }}
+    {{ form.author }}
+    {{ form.text }}
+
+    <div class='text-center mt-3'>
+        <button type='submit' class='btn btn-sm btn-primary'>Записать</button>
+    </div>
+</form>

@@ -1,0 +1,34 @@
+{% for advert in adverts %}
+    <!--карточка объявления -->
+    <div class="col-xl-5  card text-center p-1">
+        <div class="card-header">
+            {{ advert.created_at|date:'d F Y H:i:s' }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ advert.get_category_display }}</h5>
+            <p class="card-text">
+                {{ advert.title }}
+                <!--{{ advert.text|striptags|truncatewords:10 }}-->
+            </p>
+        </div>
+        <div class="card-footer text-muted">
+            <a href="{% url 'one_advert' advert.pk %}" class="btn btn-outline-primary btn-sm">Читать ...</a>
+            {% if advert.author == user %}
+                <a href="{% url 'update_advert' advert.pk %}" class="btn btn-outline-secondary btn-sm">Изменить ...</a>
+                <a href="{% url 'delete_advert' advert.pk %}" class="btn btn-outline-danger btn-sm">Удалить...</a>
+            {% endif %}
+        </div>
+    </div>
+{% empty %}
+    <h4 class='text-muted text-center'>Объявлений нет ...</h4>
+{% endfor %}
+
+<!-- вывод кнопки продолжения загрузки -->
+{% if adverts and last_date %}
+    <div id='btn' class='row justify-content-center p-4' last-date='{{ last_date }}'>
+        <div class='col-auto'><button  class="btn btn-outline-primary btn-sm">Еще объявления ...</button></div>
+    </div>    
+{% endif %}
+
+
+

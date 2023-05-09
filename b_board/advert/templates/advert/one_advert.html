@@ -1,0 +1,154 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    {{ block.super }}{{ advert.title|truncatechars:20 }}
+{% endblock title %}
+
+
+{% block content %}
+    <main class="container col-11">
+
+        <!-- верхний колонтитул -->
+        <div class='row justify-content-between my-4 p-2 bg-light'>
+            <div class="col-md-3 text-center text-md-start">{{ advert.created_at|date:'d F Y H:i:s' }}</div>
+            <h3 class="col-md-6 text-center">{{ advert.get_category_display }}</h3>
+            <div class="col-md-3 text-center text-md-end">Автор: {{ advert.author }}</div>
+            {% if advert.author == request.user %}
+                <div class='row my-2'>
+                    <div class='col text-center'>
+                        <a href="{% url 'update_advert' advert.pk %}" class="btn btn-outline-secondary btn-sm">Изменить ...</a>
+                        <a href="{% url 'delete_advert' advert.pk %}" class="btn btn-outline-danger btn-sm">Удалить...</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- заголовок объявления -->
+        <h4 class='text-center mb-4'>{{ advert.title }}</h4>  
+
+        <!-- текст объявления -->
+        {{ advert.text|safe }}  
+
+        <!-- блок вывода комментариев -->
+        <div class='row mx-md-3 my-5'>
+            
+            <!-- заголовок блока -->
+            <div class='row justify-content-between mb-3'>
+                <h5 class='col-auto'>Комментарии:</h5>
+                <div class='col-auto'>
+                    {% if request.user.is_authenticated %}
+                        {% if advert.author != request.user %}
+                            <button class="btn-add btn btn-outline-primary btn-sm" advert-pk='{{ advert.pk }}' data-url='{% url "comment_get_add_form"  %}'>
+                                Добавиь комментарий
+                            </button>
+                        {% else %}
+                            <span class='text-muted'>вы не можете комментировать собственные объявления</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Вывод комментариев  -->
+            <div id='comments' class='row mx-3 mb-2'>
+                {% for comment in advert.comment_set.all %}
+                    <div id='comment_div_{{ comment.pk }}' class='mb-3'>
+                        <strong class='text-muted'> {{ comment.created_at|date:'d F Y H:i:s' }}  {{ comment.author }}</strong>
+                        <div> {{ comment.text }} </div> 
+                        <!-- автору объявления даем возможность изменить статус -->
+                        {% if advert.author == request.user %}                  
+                            {% if comment.accepted %}
+                                <div class='text-success'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                    </svg>
+                                    принят
+                                </div>
+                            {% else %}
+                                <!-- кнопки автора объявления -->
+                                <div id='advert_author_buttons_{{ comment.pk }}'>
+                                    <button class='btn-accept btn btn-sm' comment-pk='{{ comment.pk }}'data-url='{% url "comment_accept"  %}' token='{{ csrf_token }}'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                        </svg>
+                                        Принять
+                                    </button>
+                                    <button class='btn-delete btn btn-sm' comment-pk='{{ comment.pk }}'data-url='{% url "comment_delete"  %}' token='{{ csrf_token }}'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                        </svg>
+                                        Отклонить
+                                    </button>
+                                </div>
+                                <div id='advert_comment_success_{{ comment.pk }}' class='text-success' style='display:none'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                        <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                                    </svg>
+                                    принят
+                                </div>
+                            {% endif %}
+                        <!-- если пользователь автор комметария и комментарий еще не принят даем возможность удалить или редактировать -->
+                        {% elif comment.author == request.user and not comment.accepted %}
+                            <!-- кнопки автора комментария -->
+                            <div >
+                                <button class='btn-edit btn btn-sm' comment-pk='{{ comment.pk }}' data-url='{% url "comment_get_update_form"  %}''>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                    </svg>
+                                    Изменить
+                                </button>
+                                <button class='btn-delete btn btn-sm' comment-pk='{{ comment.pk }}' data-url='{% url "comment_delete"  %}' token='{{ csrf_token }}'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                    </svg>
+                                    Удалить
+                                </button>
+                            </div>                                
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <h6 class='text-muted text-center'>Комментариев пока нет ..</h6>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- нижний колонтитул -->
+        <div class='row justify-content-between my-4 p-2 bg-light'>
+            <div class="col-md-3 text-center text-md-start">{{ advert.created_at|date:'d F Y H:i:s' }}</div>
+            {% if advert.author == request.user %}
+                <div class="col-md-6 text-center my-2">
+                    <a href="{% url 'update_advert' advert.pk %}" class="btn btn-outline-secondary btn-sm">Изменить ...</a>
+                    <a href="{% url 'delete_advert' advert.pk %}" class="btn btn-outline-danger btn-sm">Удалить...</a>
+                </div>
+            {% endif %}
+            <div class="col-md-3 text-center text-md-end">Автор: {{ advert.author }}</div>
+        </div>      
+        
+        <!-- блок формы добавления/изменения комментария -->
+        <div id='form-area' class="container col-lg-8 p-3 fixed-bottom justify-content-center" style='display:none'>
+            <div class='row p-3 justify-content-between mb-2 bg-light border border-primary '>
+                <h6 class="col-auto">Введите комментарий:</h6>
+                <div class='col-auto'>
+                    <button id='close-form-btn' class='btn btn-sm btn-outline-danger'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                        </svg>
+                    </button>   
+                </div>
+
+                <!-- сюда будет загружаться форма -->
+                <div id='form-div' class='my-2'>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+{% endblock content %}
+
+
+{% block script %}
+    <script src="{% static 'scripts/comment_handler.js' %}"></script>
+{% endblock script %}

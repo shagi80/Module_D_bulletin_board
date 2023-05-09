@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    {{ block.super }}{{ title }}
+{% endblock title %}
+
+
+{% block content %}
+    <main class="container">
+
+        <div class='row justify-content-center'>
+            <form method="POST" class='col-md-10'>
+                {% csrf_token %}
+                <h4 class="my-4">{{ title }}</h4>
+                
+                {{ form.author }}
+                
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">Категория</label>
+                    <div class="col-sm-6">
+                    {{ form.category }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">Заголовок</label>
+                    <div class="col-sm-10">
+                    {{ form.title }}
+                    </div>
+                </div>
+
+                {{ form.text }}
+
+                <div class="container mt-5 d-flex justify-content-center gap-2">
+                    <button type="submit" class="btn btn-primary">Записать</button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+{% endblock content %}
+
+
+{% block script %}
+{% endblock script %}

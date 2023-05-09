@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    {{ block.super }}Все новости
+{% endblock title %}
+
+
+{% block content %}
+    <main class="row my-5">
+
+        <!-- бокове меню выбора категории объявлений  -->
+        <div class="col-lg-3 mb-3">
+            <ul class="list-group">
+                <a href="{% url 'main' %}" class="list-group-item list-group-item-action" aria-current="true">
+                    <strong>Все объявления</strong>
+                </a>
+                {% for key,title in categories %}
+                    <a href="{% url 'adverts_from_category' forloop.counter0 %}" class="list-group-item list-group-item-action" aria-current="true">
+                        {{ title }}
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>  
+       
+        <div class="col-lg-9">
+
+            <!-- зголовок отображаемой категории --->
+            <div class='row justify-content-between align-items-center mb-4'>              
+                <h3 class="col-auto">                       
+                    {% if current_category_title %}
+                        {{ current_category_title }}
+                    {% else %}
+                        Все объявления
+                    {% endif %}
+                </h3>    
+            </div>
+
+            <!--- сюда будут загружаться блоки объявлений -->
+            <div class='row justify-content-center px-3 gap-3' id='adverts' data-urls="{% url 'get_adverts' %}" data-category='{{ current_category_key }}'>                
+            </div>
+
+            <!--- крутилка, что бы не скучно было ждать загрузки -->
+            <div class="text-center p-4" id='spinner'>
+                <button class="btn" type="button" disabled>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Загружаем ...
+                </button>
+            </div>
+
+        </div>        
+
+    </main>
+
+    
+{% endblock content %}
+
+
+{% block script %}
+    <script src="{% static 'scripts/adverts_loader.js' %}"></script>
+{% endblock script %}
+
+
