@@ -33,8 +33,8 @@ class Command(BaseCommand):
         scheduler.add_job(
             send_weekly_messages,
             trigger=CronTrigger(
-                second="*/20"
-                #day_of_week="mon", hour="00", minute="01" 
+                #second="*/20"
+                day_of_week="mon", hour="00", minute="01" 
             ),  
             id="send_weekly_messages",  # уникальный айди
             max_instances=1,
