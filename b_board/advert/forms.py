@@ -41,3 +41,10 @@ class CommentForm(forms.ModelForm):
             self.initial['advert'] = advert
         if author:
             self.initial['author'] = author
+
+
+class UserPageFilterForm(forms.Form): 
+    category = forms.ChoiceField(choices=(('', 'Все категории ...'),) + Advert.CATEGORY_CHOICES,
+                                    required=False, widget=forms.Select(attrs={"class": "form-select"}))
+    with_new_comment_only = forms.BooleanField(label='только с новыми комментариями', required=False, widget=forms.CheckboxInput(
+        attrs={"type": "checkbox", "class": "form-check-input"}))

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeeklyAdverts</title>
+</head>
+<body>
+    <div style="margin-left: auto; margin-right: auto; width: 70%">
+        <div style="padding: 20px; padding-top: 5px">
+            <h3>Здравствуй {{ user.username }}. Новые объявления за неделю !</h3>
+            <strong>У нас {{ adverts.count }} новых объявлений </strong>
+        </div>
+        <div style="padding-left: 20px; padding-right: 20px;">
+            <ul>
+            {% for advert in adverts %}
+                <li><a href="{{ domain }}{% url 'one_advert' advert.pk %}">{{ advert.title }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

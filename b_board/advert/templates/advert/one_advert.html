@@ -54,7 +54,13 @@
             <div id='comments' class='row mx-3 mb-2'>
                 {% for comment in advert.comment_set.all %}
                     <div id='comment_div_{{ comment.pk }}' class='mb-3'>
-                        <strong class='text-muted'> {{ comment.created_at|date:'d F Y H:i:s' }}  {{ comment.author }}</strong>
+                        <strong class='text-muted'>
+                            {% if advert.author == request.user and comment.accepted != True %}
+                                <span class='text-danger'>НОВЫЙ ! </span>
+                            {% endif %}
+                            {{ comment.created_at|date:'d F Y H:i:s' }}
+                            {{ comment.author }}
+                        </strong>
                         <div> {{ comment.text }} </div> 
                         <!-- автору объявления даем возможность изменить статус -->
                         {% if advert.author == request.user %}                  

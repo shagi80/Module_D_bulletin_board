@@ -7,17 +7,21 @@
     
 $('.btn-accept').click(function(e){
     var pk = $(this).attr('comment-pk');
+    // меняем фронтенд не дожидаясь ответа что бы пользователь
+    // не кликал безудежно кнопку пока идет отпрака почты
+    $('#advert_author_buttons_' + pk).hide();
+    $('#advert_comment_success_' + pk).css("display", "block");
+
     $.ajax({
         type: "POST",
         url: $(this).attr('data-url'),
         data: {'csrfmiddlewaretoken':  $(this).attr('token'),
                'pk': pk,
             },
-        // получаем подтверждение сервера и меняем фронтэнд
+        // проверям успех операции
         success:function (data) {
-            if(data = 'success'){
-                $('#advert_author_buttons_' + pk).hide();
-                $('#advert_comment_success_' + pk).css("display", "block");
+            if(data != 'success'){
+                alert('Ошибка сервера !');
             };
         },
     });
@@ -25,16 +29,20 @@ $('.btn-accept').click(function(e){
     
 $('.btn-delete').click(function(e){
     var pk = $(this).attr('comment-pk');
+    // меняем фронтенд не дожидаясь ответа что бы пользователь
+    // не кликал безудежно кнопку пока идет отпрака почты
+    $('#comment_div_' + pk).hide();
+    
     $.ajax({
         type: "POST",
         url: $(this).attr('data-url'),
         data: {'csrfmiddlewaretoken':  $(this).attr('token'),
                'pk': pk,
             },
-        // получаем подтверждение сервера и меняем фронтэнд
+        //проверям успех операции
         success:function (data) {
-            if(data = 'success'){
-                $('#comment_div_' + pk).hide();
+            if(data != 'success'){
+                alert('Ошибка сервера !');
             };
         },
     });
@@ -80,7 +88,8 @@ $('.btn-add').click(function(e){
 */
 
 $('#form-area').submit(function(event){
-    $('#form-area').css("display", "none")
+    $('#form-area').css("display", "none");
+    $('.btn-add').hide();
 });
 
 $('#close-form-btn').click(function(event){

@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Signup" %}{% endblock %}
+
+{% block content %}
+
+<div class = 'row justify-content-center'>
+  <div class='col-md-6 text-center my-3 border border-dark py-5 bg-light'>
+    <h1>{% trans "Sign Up"|upper %}</h1>
+
+    <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+    <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+      {% csrf_token %}
+
+      <div class='row mb-3 justify-content-center'>
+        <div class='col-8'>
+          <div class='row mb-2 text-center'>
+            <div class='col-lg-6 text-lg-start'>{% trans "E-mail" %}</div>
+            <div class='col-lg-6'>{{ form.email }}</div>
+            <div class='col-12 text-start text-danger'>{{ form.email.errors }}</div>
+          </div>
+          <div class='row mb-2 text-center'>
+            <div class='col-lg-6 text-lg-start'>{% trans "Username" %}</div>
+            <div class='col-lg-6'>{{ form.username }}</div>
+            <div class='col-12 text-start text-danger'>{{ form.username.errors }}</div>
+          </div>
+          <div class='row mb-2 text-center'>
+            <div class='col-lg-6 text-lg-start'>{% trans "Password" %}</div>
+            <div class='col-lg-6'>{{ form.password1 }}</div>
+            <div class='col-12 text-start text-danger'>{{ form.password1.errors }}</div>
+          </div>
+          <div class='row mb-2 text-center'>
+            <div class='col-lg-6 text-lg-start'>{% trans "Password (again)" %}</div>
+            <div class='col-lg-6'>{{ form.password2 }}</div>
+            <div class='col-12 text-start text-danger'>{{ form.password2.errors }}</div>
+          </div>
+        </div>
+      </div>
+
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+      <button type="submit" class='btn btn-primary'>{% trans "Sign Up" %} &raquo;</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

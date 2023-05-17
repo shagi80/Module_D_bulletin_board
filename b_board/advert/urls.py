@@ -18,5 +18,4 @@ urlpatterns = [
     path('comment-get-add-form/', comment_get_add_form, name = 'comment_get_add_form'),
     path('comment-update/<int:pk>', comment_update, name = 'comment_update'),
     path('user-page/', UserPage.as_view(), name = 'user_page'),
-    path('user-page/<int:category_id>', UserPage.as_view(), name = 'user_page_category'),
 ]

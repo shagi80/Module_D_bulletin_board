@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewCommentMail</title>
+</head>
+<body>
+    <div style="margin-left: auto; margin-right: auto; width: 70%">
+        <div style="padding: 20px; padding-top: 5px">
+            <h3>{{ body_text }}</h3>
+            <strong>{{ comment.advert.title }} </strong>
+        </div>
+        <div style="padding-left: 20px; padding-right: 20px;">
+            <h3>{{ comment.created_at|date:'d F Y H:i:s' }}
+                {{ comment.author }}
+            </h3>
+            <p>{{ comment.text }}</p>
+            <a href="{{ url }}" style="text-decoration: none;">Перейти на сайт ...</a>
+        </div>
+    </div>
+</body>
+</html>

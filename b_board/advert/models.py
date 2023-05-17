@@ -5,22 +5,22 @@ from django.urls import reverse
 from tinymce import models as tinymce_models
 
 
-CATEGORY_CHOICES = (
-    ("tanks", "Танки"),
-    ("heals", "Хилы"),
-    ("dnd", "ДНД"),
-    ("merchants", "Торговцы"),
-    ("guildmasters", "Гилдамастеры"),
-    ("giver_quest", "Квестгиверы"),
-    ("blackmiths", "Кузнецы"),
-    ("leatherworkers", "Кожевники"),
-    ("potions_masters", "Зельевары"),
-    ("spellmasters", "Мастера заклинаний"),
-)
-
-
 class Advert(models.Model):
     """ модель Объявление """
+
+    CATEGORY_CHOICES = (
+        ("tanks", "Танки"),
+        ("heals", "Хилы"),
+        ("dnd", "ДНД"),
+        ("merchants", "Торговцы"),
+        ("guildmasters", "Гилдамастеры"),
+        ("giver_quest", "Квестгиверы"),
+        ("blackmiths", "Кузнецы"),
+        ("leatherworkers", "Кожевники"),
+        ("potions_masters", "Зельевары"),
+        ("spellmasters", "Мастера заклинаний"),
+    )
+
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=50,
                                 null=False, blank=False, verbose_name='Категория')
     title = models.CharField(max_length=255, null=False, blank=False,
@@ -43,8 +43,13 @@ class Advert(models.Model):
     def get_absolute_url(self):
         return reverse("one_advert", kwargs={"pk": self.pk})
     
-
+    @staticmethod
+    def get_category_title(need_key):
+        for key, title in Advert.CATEGORY_CHOICES:
+            if key == need_key:
+                return title
     
+   
 class Comment(models.Model):
     """ модель Комментария """
     advert = models.ForeignKey(Advert, on_delete=models.CASCADE, null=False,

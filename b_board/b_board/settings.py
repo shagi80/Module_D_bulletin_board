@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,9 +39,18 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
     'tinymce',
 
+    'django_apscheduler',
+
     'advert.apps.AdvertConfig',
+    'mail.apps.MailConfig',
 ]
 
 MIDDLEWARE = [
@@ -144,3 +154,37 @@ TINYMCE_DEFAULT_CONFIG = {
     "a11ycheck ltr rtl | showcomments addcomment code",
     "custom_undo_redo_levels": 10,
 }
+
+#---------------------------- настройка почты ---------------------------------
+
+EMAIL_HOST = 'smtp.yandex.ru' 
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'shagi80'
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = 'Доска объявлений<' + EMAIL_HOST_USER + '@yandex.ru>'
+
+
+#---------------------------- настройка AllAuth ---------------------------------
+
+SITE_ID = 1
+
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+ACCOUNT_EMAIL_REQUIRED = True # требовать e-mail при регистрации
+ACCOUNT_UNIQUE_EMAIL = True # e-mail должен быть уникальным
+ACCOUNT_EMAIL_VERIFICATION = "mandatory" # регистрировать после подтверждения по e-mail
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True # автоматический вход в систему после подтверждения e-mail
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True # проверка адреса электронной почты по ключу
+ACCOUNT_EMAIL_SUBJECT_PREFIX = 'Доска объявлений.'
+
+
+# --------------- настройка приложения django-apscheduler -------------------------
+
+# формат даты, которую будет воспринимать наш задачник(вспоминаем урок по фильтрам) 
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+ 
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
